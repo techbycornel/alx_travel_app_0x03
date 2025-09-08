@@ -2,18 +2,19 @@ import environ
 import os
 from pathlib import Path
 
-# BASE DIR
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables
-env = environ.Env()
+env = environ.Env(
+    DEBUG=(bool, False)
+)
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env("SECRET_KEY")
-DEBUG = env.bool("DEBUG", default=True)
+DEBUG = env("DEBUG")
+
 ALLOWED_HOSTS = ["*"]
 
-# Installed apps
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -32,9 +33,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",  # CORS
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -44,7 +45,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "alx_travel_app.urls"
 
-# Database (MySQL)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -56,15 +56,24 @@ DATABASES = {
     }
 }
 
-# REST Framework
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
-    ]
-}
-
-# CORS
 CORS_ALLOW_ALL_ORIGINS = True
 
-# Static files
-STATIC_URL = "/static/"
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema"
+}
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],  # you can add custom template folders here if needed
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
